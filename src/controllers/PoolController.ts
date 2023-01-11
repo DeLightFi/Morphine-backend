@@ -1,19 +1,18 @@
 import * as Express from 'express';
 import ErrorHandler from "../models/ErrorHandler";
-import { StreamClient, ChannelCredentials } from '@apibara/protocol'
-import { Filter, FieldElement, v1alpha2 as starknet } from '@apibara/starknet'
-import { hash } from 'starknet';
-import { apibara } from '../lib/apibara';
+import Pool from "../schema/pool.model";
 
 class PoolController {
   defaultMethod() {
     throw new ErrorHandler(501, 'Not implemented method');
   }
 
-  GetData = ((req: Express.Request, res: Express.Response) => {
-    const results = apibara(BigInt(req.params.address));
-    res.status(201).json({results: results})
-  })
+  public async get_pool(req: Express.Request, res: Express.Response) {
+    const { address } = req.params;
+    //@ts-ignore
+    const data = await Pool.find({ pool: address})
+    res.json({data: data})
+  }
 }
 
 export = new PoolController();
