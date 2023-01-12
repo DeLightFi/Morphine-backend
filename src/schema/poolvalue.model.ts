@@ -3,29 +3,20 @@ import mongoose from 'mongoose'
 /**
  * Provider Schema
  */
-const PoolSchema = new mongoose.Schema({
-    event_id: {
+const PoolValueSchema = new mongoose.Schema({
+    pool_address: {
         type: String,
     },
-    block: {
+    borrowrate: {
         type: String,
     },
-    pool: {
+    supplyrate: {
         type: String,
     },
-    event_name: {
+    totalassets: {
         type: String,
     },
-    from: {
-        type: String,
-    },
-    to: {
-        type: String,
-    },
-    amount: {
-        type: String,
-    },
-    shares: {
+    totalborrows: {
         type: String,
     },
     date: {
@@ -44,11 +35,11 @@ const PoolSchema = new mongoose.Schema({
 /**
  * Methods
  */
-PoolSchema.method({})
+PoolValueSchema.method({})
 
 
 /**
- * @typedef Pool
+ * @typedef PoolValue
  */
-export default mongoose.models.Pool ||
-    mongoose.model('Pool', PoolSchema)
+export default mongoose.models.PoolValue ||
+    mongoose.model('PoolValue', PoolValueSchema)

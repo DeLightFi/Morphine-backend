@@ -6,14 +6,27 @@ import {
   bufferToHex,
 } from "@apibara/protocol";
 import { Block, TransactionReceipt } from "@apibara/starknet";
+import * as fs from "fs";
 import BN from "bn.js";
-import Pool from "../schema/pool.model";
-import { hash } from "starknet";
+import PoolEvent from "../schema/poolevent.model";
+import PoolValue from "../schema/poolvalue.model";
+import { hash, Provider, Contract, json } from "starknet";
 import { PoolMapping } from "./mapping";
 
-export class PoolJob {
+
+function uint256FromBytes(low: Buffer, high: Buffer): BN {
+  const lowB = new BN(low);
+  const highB = new BN(high);
+  return highB.shln(128).add(lowB);
+}
+
+
+// Use apibara to fetch blockchain events, then decode if these 
+// events are pool events, and if there are in the mapping
+export class PoolEventsFetcher {
   private readonly client: NodeClient;
   private readonly indexerId: string;
+  private defaultblock : number = 36875;
   private shouldStop: boolean = false;
 
   constructor(indexerId: string, url: string) {
@@ -23,19 +36,24 @@ export class PoolJob {
 
   async run() {
     //@ts-ignore
-    const current_block = parseInt((await Pool.findOne({}, {}, { sort: { 'date' : -1 } })).block);
+    const last_poolevent = await PoolEvent.findOne({}, {}, { sort: { 'date': -1 } });
+    var start_block = this.defaultblock;
+    if(last_poolevent){
+      start_block = parseInt(last_poolevent.block);
+    }
+
     const messages = this.client.streamMessages(
-      { 
-        startingSequence: current_block
+      {
+        startingSequence: start_block
       }
     );
 
     return new Promise((resolve, reject) => {
       messages.on('data', (message) => {
         this.handleData(message);
-        if (this.shouldStop){
+        if (this.shouldStop) {
           resolve(undefined);
-        } 
+        }
       })
       messages.on('error', reject)
       messages.on('end', resolve)
@@ -56,42 +74,41 @@ export class PoolJob {
 
   async handleBlock(block: Block) {
     for (let receipt of block.transactionReceipts) {
-      if((Date.now() - block.timestamp.getTime())/1000 <= 150){
+      if ((Date.now() - block.timestamp.getTime()) / 1000 <= 150) {
         this.shouldStop = true;
         return;
       }
       await this.handleTransaction(block, receipt);
     }
-
   }
 
   async handleTransaction(
     block: Block,
     receipt: TransactionReceipt
   ) {
-    let i : number = 0;
+    let i: number = 0;
     for (let event of receipt.events) {
-      let t_address : string;
-      let t_key : string;
-      for(let mapping_address of PoolMapping.address){
-        if(hexToBuffer(mapping_address, 32).equals(event.fromAddress)){
+      let t_address: string;
+      let t_key: string;
+      for (let mapping_address of PoolMapping.address) {
+        if (hexToBuffer(mapping_address, 32).equals(event.fromAddress)) {
           t_address = mapping_address
           continue;
         }
       }
       if (!t_address) {
-        i+=1;
+        i += 1;
         continue;
       }
 
-      for(let mapping_key of PoolMapping.key){
-        if(hexToBuffer(hash.getSelectorFromName(mapping_key), 32).equals(event.keys[0])){
+      for (let mapping_key of PoolMapping.key) {
+        if (hexToBuffer(hash.getSelectorFromName(mapping_key), 32).equals(event.keys[0])) {
           t_key = mapping_key
           continue;
         }
       }
       if (!t_key) {
-        i+=1;
+        i += 1;
         continue;
       }
 
@@ -107,14 +124,14 @@ export class PoolJob {
       );
 
       //@ts-ignore
-      await Pool.findOneAndUpdate(
+      await PoolEvent.findOneAndUpdate(
         {
           event_id: `${bufferToHex(Buffer.from(receipt.transactionHash))}_${i}`
         },
         {
           event_id: `${bufferToHex(Buffer.from(receipt.transactionHash))}_${i}`,
           block: block.blockNumber,
-          pool: t_address,
+          pool_address: t_address,
           event_name: t_key,
           from: from_,
           to: to,
@@ -122,16 +139,47 @@ export class PoolJob {
           shares: shares,
           date: block.timestamp
         },
-        {upsert: true, new: true, setDefaultsOnInsert: true}
+        { upsert: true, new: true, setDefaultsOnInsert: true }
       )
 
-      i+=1;
+      i += 1;
     }
   }
 }
 
-function uint256FromBytes(low: Buffer, high: Buffer): BN {
-  const lowB = new BN(low);
-  const highB = new BN(high);
-  return highB.shln(128).add(lowB);
+
+// borrowrate / supplyrate / totalassets /  totalborrows --> hourly
+export class PoolValuesFetcher {
+  // init
+  private provider = new Provider({ sequencer: { baseUrl: "testnet-2" } });
+  private compiledABI = json.parse(fs.readFileSync("./ABIs/pool.json").toString("ascii"));
+
+  async CallContract(pooladdress: string) {
+    const poolContract = new Contract(this.compiledABI.abi, pooladdress, this.provider);
+
+    const borrowrate = await poolContract.call("borrowrate");
+    const supplyrate = await poolContract.call("supplyrate");
+    const totalassets = await poolContract.call("totalassets");
+    const totalborrows = await poolContract.call("totalborrows");
+    console.log(borrowrate, supplyrate, totalassets, totalborrows);
+
+    //@ts-ignore
+    const newpoolvalue = new poolvalue(
+      {
+        pool_address: pooladdress,
+        borrowrate: borrowrate,
+        supplyrate: supplyrate,
+        totalassets: totalassets,
+        totalborrows: totalborrows,
+        date: Date.now()
+      }
+    )
+    await newpoolvalue.save()
+  }
+
+  async PoolIterations(){
+    for (let pool_address of PoolMapping.address) {
+      await this.CallContract(pool_address);
+    }
+  }
 }
