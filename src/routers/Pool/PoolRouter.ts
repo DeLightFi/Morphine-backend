@@ -17,7 +17,9 @@ class PoolRouter {
    * Connect routes to their matching controller endpoints.
    */
   private _configure() {
-    this._router.get('/:address', this._controller.get_pool);
+    this._router.get('/events/:address', this._controller.get_poolevents);
+    this._router.get('/values/:address', this._controller.get_poolvalues);
+
   }
 }
 

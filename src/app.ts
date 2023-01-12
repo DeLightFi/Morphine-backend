@@ -41,7 +41,8 @@ mongoose
       server.app.listen(port, () => {
         console.log(("App is running at http://localhost:%d in %s mode"), port, process.env.NODE_ENV);
         console.log("Press CTRL-C to stop\n");
-        job.FetchPool();
+        job.PoolEvents();
+        job.PoolValues();
       });
 
       server.app.on('close', () => {

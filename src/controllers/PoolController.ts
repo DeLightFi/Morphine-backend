@@ -1,17 +1,26 @@
 import * as Express from 'express';
 import ErrorHandler from "../models/ErrorHandler";
-import Pool from "../schema/pool.model";
+import PoolEvent from "../schema/poolevent.model";
+import PoolValue from "../schema/poolvalue.model";
+
 
 class PoolController {
   defaultMethod() {
     throw new ErrorHandler(501, 'Not implemented method');
   }
 
-  public async get_pool(req: Express.Request, res: Express.Response) {
+  public async get_poolevents(req: Express.Request, res: Express.Response) {
     const { address } = req.params;
     //@ts-ignore
-    const data = await Pool.find({ pool: address})
-    res.json({data: data})
+    const data = await PoolEvent.find({ pool_address: address })
+    res.json({ data: data })
+  }
+
+  public async get_poolvalues(req: Express.Request, res: Express.Response) {
+    const { address } = req.params;
+    //@ts-ignore
+    const data = await PoolValue.find({ pool_address: address })
+    res.json({ data: data })
   }
 }
 

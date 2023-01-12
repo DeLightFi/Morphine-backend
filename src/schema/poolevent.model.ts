@@ -3,14 +3,14 @@ import mongoose from 'mongoose'
 /**
  * Provider Schema
  */
-const PoolSchema = new mongoose.Schema({
+const PoolEventSchema = new mongoose.Schema({
     event_id: {
         type: String,
     },
     block: {
         type: String,
     },
-    pool: {
+    pool_address: {
         type: String,
     },
     event_name: {
@@ -44,11 +44,11 @@ const PoolSchema = new mongoose.Schema({
 /**
  * Methods
  */
-PoolSchema.method({})
+PoolEventSchema.method({})
 
 
 /**
- * @typedef Pool
+ * @typedef PoolEvent
  */
-export default mongoose.models.Pool ||
-    mongoose.model('Pool', PoolSchema)
+export default mongoose.models.PoolEvent ||
+    mongoose.model('PoolEvent', PoolEventSchema)
