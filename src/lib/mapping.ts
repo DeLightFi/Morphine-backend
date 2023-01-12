@@ -5,6 +5,8 @@ export const PoolMapping = {
     ],
     key: [
         "Withdraw",
-        "Deposit"
+        "Deposit",
+        "Borrow",
+        "RepayDebt"
     ]
 };
