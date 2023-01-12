@@ -10,13 +10,13 @@ const PoolValueSchema = new mongoose.Schema({
     borrowrate: {
         type: String,
     },
-    supplyrate: {
+    totalsupply: {
         type: String,
     },
     totalassets: {
         type: String,
     },
-    totalborrows: {
+    totalborrowed: {
         type: String,
     },
     date: {

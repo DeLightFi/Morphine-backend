@@ -42,7 +42,7 @@ mongoose
         console.log(("App is running at http://localhost:%d in %s mode"), port, process.env.NODE_ENV);
         console.log("Press CTRL-C to stop\n");
         job.PoolEvents();
-        //job.PoolValues();
+        job.PoolValues();
       });
 
       server.app.on('close', () => {

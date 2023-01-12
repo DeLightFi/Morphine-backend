@@ -2,12 +2,8 @@ import * as schedule from "node-schedule";
 import { PoolEventsFetcher, PoolValuesFetcher } from "../lib/pool";
 
 let padZero = (v: number, n = 2) => `${v}`.padStart(n, "0");
-let toTime = (v : number) => 
-  `elapsed (hh:mm:ss:ms) ${
-    padZero(Math.floor(v/(60*60000)))}:${
-      padZero(Math.floor(v/60000))}:${
-        padZero(Math.floor(v/1000))}:${
-          padZero(Math.floor(v%1000), 3)}`;
+let toTime = (v: number) =>
+  `elapsed (hh:mm:ss:ms) ${padZero(Math.floor(v / (60 * 60000)))}:${padZero(Math.floor(v / 60000))}:${padZero(Math.floor(v / 1000))}:${padZero(Math.floor(v % 1000), 3)}`;
 
 class job {
   constructor() {

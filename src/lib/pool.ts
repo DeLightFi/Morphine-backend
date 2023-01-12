@@ -26,7 +26,7 @@ function uint256FromBytes(low: Buffer, high: Buffer): BN {
 export class PoolEventsFetcher {
   private readonly client: NodeClient;
   private readonly indexerId: string;
-  private defaultblock : number = 36875;
+  private defaultblock: number = 36875;
   private shouldStop: boolean = false;
 
   constructor(indexerId: string, url: string) {
@@ -38,7 +38,7 @@ export class PoolEventsFetcher {
     //@ts-ignore
     const last_poolevent = await PoolEvent.findOne({}, {}, { sort: { 'date': -1 } });
     var start_block = this.defaultblock;
-    if(last_poolevent){
+    if (last_poolevent) {
       start_block = parseInt(last_poolevent.block);
     }
 
@@ -151,33 +151,32 @@ export class PoolEventsFetcher {
 // borrowrate / supplyrate / totalassets /  totalborrows --> hourly
 export class PoolValuesFetcher {
   // init
-  private provider = new Provider({ sequencer: { baseUrl: "testnet-2" } });
-  private compiledABI = json.parse(fs.readFileSync("./ABIs/pool.json").toString("ascii"));
+  private provider = new Provider({ sequencer: { network: 'goerli-alpha-2' } });
+  private compiledABI = json.parse(fs.readFileSync(require.resolve("./abi/pool.json")).toString("ascii"));
 
   async CallContract(pooladdress: string) {
     const poolContract = new Contract(this.compiledABI.abi, pooladdress, this.provider);
 
-    const borrowrate = await poolContract.call("borrowrate");
-    const supplyrate = await poolContract.call("supplyrate");
-    const totalassets = await poolContract.call("totalassets");
-    const totalborrows = await poolContract.call("totalborrows");
-    console.log(borrowrate, supplyrate, totalassets, totalborrows);
+    const borrowrate = await poolContract.call("borrowRate");
+    const totalsupply = await poolContract.call("totalSupply");
+    const totalassets = await poolContract.call("totalAssets");
+    const totalborrowed = await poolContract.call("totalBorrowed");
 
     //@ts-ignore
-    const newpoolvalue = new poolvalue(
+    const newpoolvalue = new PoolValue(
       {
         pool_address: pooladdress,
-        borrowrate: borrowrate,
-        supplyrate: supplyrate,
-        totalassets: totalassets,
-        totalborrows: totalborrows,
+        borrowrate: uint256FromBytes(borrowrate[0].low, borrowrate[0].high).toString(),
+        totalsupply: uint256FromBytes(totalsupply[0].low, totalsupply[0].high).toString(),
+        totalassets: uint256FromBytes(totalassets[0].low, totalassets[0].high).toString(),
+        totalborrowed: uint256FromBytes(totalborrowed[0].low, totalborrowed[0].high).toString(),
         date: Date.now()
       }
     )
     await newpoolvalue.save()
   }
 
-  async PoolIterations(){
+  async PoolIterations() {
     for (let pool_address of PoolMapping.address) {
       await this.CallContract(pool_address);
     }
