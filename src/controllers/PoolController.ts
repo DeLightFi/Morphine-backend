@@ -1,6 +1,6 @@
 import * as Express from 'express';
 import ErrorHandler from "../models/ErrorHandler";
-import Pool from "../schema/pool.model";
+import PoolEvent from "../schema/poolevent.model";
 
 class PoolController {
   defaultMethod() {
@@ -10,7 +10,7 @@ class PoolController {
   public async get_pool(req: Express.Request, res: Express.Response) {
     const { address } = req.params;
     //@ts-ignore
-    const data = await Pool.find({ pool: address})
+    const data = await PoolEvent.find({ pool_address: address})
     res.json({data: data})
   }
 }
