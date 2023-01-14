@@ -12,28 +12,28 @@ class PoolController {
   public async get_all_poolevents(req: Express.Request, res: Express.Response) {
     const { pooladdress } = req.params;
     //@ts-ignore
-    const data = await PoolEvent.find({ pool_address: pooladdress })
+    const data = await PoolEvent.find({ pool_address: pooladdress.toLowerCase() })
     res.json({ data: data })
   }
 
   public async get_user_from_poolevents(req: Express.Request, res: Express.Response) {
     const { pooladdress, walletaddress } = req.params;
     //@ts-ignore
-    const data = await PoolEvent.find({ pool_address: pooladdress, from: walletaddress })
+    const data = await PoolEvent.find({ pool_address: pooladdress.toLowerCase(), from: walletaddress.toLowerCase() })
     res.json({ data: data })
   }
 
   public async get_user_to_poolevents(req: Express.Request, res: Express.Response) {
     const { pooladdress, walletaddress } = req.params;
     //@ts-ignore
-    const data = await PoolEvent.find({ pool_address: pooladdress, to: walletaddress })
+    const data = await PoolEvent.find({ pool_address: pooladdress.toLowerCase(), to: walletaddress.toLowerCase() })
     res.json({ data: data })
   }
 
   public async get_all_poolvalues(req: Express.Request, res: Express.Response) {
     const { pooladdress } = req.params;
     //@ts-ignore
-    const data = await PoolValue.find({ pool_address: pooladdress })
+    const data = await PoolValue.find({ pool_address: pooladdress.toLowerCase() })
     res.json({ data: data })
   }
 }
