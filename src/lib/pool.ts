@@ -118,10 +118,6 @@ export class PoolEventsFetcher {
         Buffer.from(event.data[2]),
         Buffer.from(event.data[3])
       );
-      const shares = uint256FromBytes(
-        Buffer.from(event.data[4]),
-        Buffer.from(event.data[5])
-      );
 
       //@ts-ignore
       await PoolEvent.findOneAndUpdate(
@@ -136,7 +132,6 @@ export class PoolEventsFetcher {
           from: from_.toLowerCase(),
           to: to.toLowerCase(),
           amount: amount,
-          shares: shares,
           date: block.timestamp
         },
         { upsert: true, new: true, setDefaultsOnInsert: true }
