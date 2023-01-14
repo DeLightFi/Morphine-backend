@@ -131,10 +131,10 @@ export class PoolEventsFetcher {
         {
           event_id: `${bufferToHex(Buffer.from(receipt.transactionHash))}_${i}`,
           block: block.blockNumber,
-          pool_address: t_address,
+          pool_address: t_address.toLowerCase(),
           event_name: t_key,
-          from: from_,
-          to: to,
+          from: from_.toLowerCase(),
+          to: to.toLowerCase(),
           amount: amount,
           shares: shares,
           date: block.timestamp
@@ -165,7 +165,7 @@ export class PoolValuesFetcher {
     //@ts-ignore
     const newpoolvalue = new PoolValue(
       {
-        pool_address: pooladdress,
+        pool_address: pooladdress.toLowerCase(),
         borrowrate: uint256FromBytes(borrowrate[0].low, borrowrate[0].high).toString(),
         totalsupply: uint256FromBytes(totalsupply[0].low, totalsupply[0].high).toString(),
         totalassets: uint256FromBytes(totalassets[0].low, totalassets[0].high).toString(),
@@ -178,7 +178,7 @@ export class PoolValuesFetcher {
 
   async PoolIterations() {
     for (let pool_address of PoolMapping.address) {
-      await this.CallContract(pool_address);
+      await this.CallContract(pool_address.toLowerCase());
     }
   }
 }
