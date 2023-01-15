@@ -7,7 +7,7 @@ export const PoolMapping = {
     key: [
         "Withdraw",
         "Deposit",
-        // "Borrow", need new schema : from_ fel and amount	Uint256
-        // "repayDripDebt", need new schema : 3 times Uint256
+        "Borrow",
+        // "repayDripDebt", _borrowed_amount, _profit, _loss | Uint256
     ]
 };
