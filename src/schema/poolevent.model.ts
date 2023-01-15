@@ -25,9 +25,6 @@ const PoolEventSchema = new mongoose.Schema({
     amount: {
         type: String,
     },
-    shares: {
-        type: String,
-    },
     date: {
         type: Date,
         default: Date.now,

@@ -112,16 +112,35 @@ export class PoolEventsFetcher {
         continue;
       }
 
-      const from_ = bufferToHex(Buffer.from(event.data[0]))
-      const to = bufferToHex(Buffer.from(event.data[1]))
-      const amount = uint256FromBytes(
-        Buffer.from(event.data[2]),
-        Buffer.from(event.data[3])
-      );
-      const shares = uint256FromBytes(
-        Buffer.from(event.data[4]),
-        Buffer.from(event.data[5])
-      );
+      let from_: any;
+      let to: any;
+      let amount: any;
+
+      if (hexToBuffer(hash.getSelectorFromName("Borrow"), 32).equals(event.keys[0])) {
+        from_ = bufferToHex(Buffer.from(event.data[0]))
+        to = bufferToHex(Buffer.from(event.data[0]))
+        amount = uint256FromBytes(
+          Buffer.from(event.data[1]),
+          Buffer.from(event.data[2])
+        );
+      }
+      // to schema for repayDripDebt
+      /* else if (hexToBuffer(hash.getSelectorFromName("repayDripDebt"), 32).equals(event.keys[0])) {
+        from_ = bufferToHex(Buffer.from(event.data[0]))
+        to = bufferToHex(Buffer.from(event.data[0]))
+        amount = uint256FromBytes(
+          Buffer.from(event.data[1]),
+          Buffer.from(event.data[2])
+        );
+      } */
+      else {
+        from_ = bufferToHex(Buffer.from(event.data[0]))
+        to = bufferToHex(Buffer.from(event.data[1]))
+        amount = uint256FromBytes(
+          Buffer.from(event.data[2]),
+          Buffer.from(event.data[3])
+        );
+      }
 
       //@ts-ignore
       await PoolEvent.findOneAndUpdate(
@@ -136,7 +155,6 @@ export class PoolEventsFetcher {
           from: from_.toLowerCase(),
           to: to.toLowerCase(),
           amount: amount,
-          shares: shares,
           date: block.timestamp
         },
         { upsert: true, new: true, setDefaultsOnInsert: true }
