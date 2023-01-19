@@ -25,7 +25,7 @@ const server = new Server();
 mongoose
   .connect(process.env.MONGODB_URI || 'none')
   .then(async connection => {
-    server.app.use(cors({ origin: "http://localhost:3000" }))
+    //server.app.use(cors({ origin: "http://localhost:3000" }))
 
     server.app.use('/api', server.router);
 
