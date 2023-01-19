@@ -71,4 +71,4 @@ mongoose
     })();
 })
     .catch(error => console.log(error));
-//# sourceMappingURL=app.js.map
+//# sourceMappingURL=index.js.map
