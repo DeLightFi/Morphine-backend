@@ -6,12 +6,14 @@
   "pre-commit": [
     "ts.check",
     "build",
+    "copy-views",
     "add-build"
   ],
   "scripts": {
     "dev": "npx ts-node-dev src/index.ts",
     "start": "nodemon src/index.ts",
     "build": "rimraf dist && tsc",
+    "copy-views": "cp -rv src/views dist/views/",
     "ts.check": "tsc --project tsconfig.json",
     "add-build": "git add dist",
     "test": "echo \"Error: no test specified\" && exit 1"
