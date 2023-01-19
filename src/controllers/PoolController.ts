@@ -17,16 +17,16 @@ class PoolController {
   }
 
   public async get_user_from_poolevents(req: Express.Request, res: Express.Response) {
-    const { pooladdress, walletaddress } = req.params;
+    const { walletaddress } = req.params;
     //@ts-ignore
-    const data = await PoolEvent.find({ pool_address: pooladdress.toLowerCase(), from: walletaddress.toLowerCase() })
+    const data = await PoolEvent.find({ from: walletaddress.toLowerCase() })
     res.json({ data: data })
   }
 
   public async get_user_to_poolevents(req: Express.Request, res: Express.Response) {
-    const { pooladdress, walletaddress } = req.params;
+    const { walletaddress } = req.params;
     //@ts-ignore
-    const data = await PoolEvent.find({ pool_address: pooladdress.toLowerCase(), to: walletaddress.toLowerCase() })
+    const data = await PoolEvent.find({ to: walletaddress.toLowerCase() })
     res.json({ data: data })
   }
 

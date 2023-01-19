@@ -18,8 +18,8 @@ class PoolRouter {
    */
   private _configure() {
     this._router.get('/:pooladdress/events', this._controller.get_all_poolevents);
-    this._router.get('/:pooladdress/events/from/:walletaddress', this._controller.get_user_from_poolevents);
-    this._router.get('/:pooladdress/events/to/:walletaddress', this._controller.get_user_to_poolevents);
+    this._router.get('/events/from/:walletaddress', this._controller.get_user_from_poolevents);
+    this._router.get('/events/to/:walletaddress', this._controller.get_user_to_poolevents);
 
     this._router.get('/:pooladdress/values', this._controller.get_all_poolvalues);
   }
