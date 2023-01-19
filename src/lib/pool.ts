@@ -124,15 +124,14 @@ export class PoolEventsFetcher {
           Buffer.from(event.data[2])
         );
       }
-      // to schema for repayDripDebt
-      /* else if (hexToBuffer(hash.getSelectorFromName("repayDripDebt"), 32).equals(event.keys[0])) {
-        from_ = bufferToHex(Buffer.from(event.data[0]))
-        to = bufferToHex(Buffer.from(event.data[0]))
+      else if (hexToBuffer(hash.getSelectorFromName("repayDripDebt"), 32).equals(event.keys[0])) {
+        from_ = "0x0"
+        to = "0x0" // TODO: change it to pool address
         amount = uint256FromBytes(
-          Buffer.from(event.data[1]),
-          Buffer.from(event.data[2])
+          Buffer.from(event.data[0]),
+          Buffer.from(event.data[1])
         );
-      } */
+      }
       else {
         from_ = bufferToHex(Buffer.from(event.data[0]))
         to = bufferToHex(Buffer.from(event.data[1]))

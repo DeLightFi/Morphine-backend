@@ -8,6 +8,6 @@ export const PoolMapping = {
         "Withdraw",
         "Deposit",
         "Borrow",
-        // "repayDripDebt", _borrowed_amount, _profit, _loss | Uint256
+        "repayDripDebt"
     ]
 };
