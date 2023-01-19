@@ -52,11 +52,11 @@ Fetch all
 Fetch receiver events
 
 ```
-/pool/:pooladdress/events/to/:receiveraddress
+/pool/events/to/:receiveraddress
 ```
 
 Fetch sender events
 
 ```
-/pool/:pooladdress/events/from/:senderaddress
+/pool/events/from/:senderaddress
 ```
