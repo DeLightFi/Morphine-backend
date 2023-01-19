@@ -26,8 +26,13 @@ mongoose
   .connect(process.env.MONGODB_URI || 'none')
   .then(async connection => {
     //server.app.use(cors({ origin: "http://localhost:3000" }))
+    server.app.set('views', __dirname + '/views');
+    server.app.engine('.html', require('ejs').__express);
+    server.app.use('/', server.router);
 
-    server.app.use('/api', server.router);
+    server.app.get("/", (req: Request, res: Response) => {
+      res.render('home.html')
+    });
 
     server.app.use((err: ErrorHandler, req: Request, res: Response, next: NextFunction) => {
       res.status(err.statusCode || 500).json({

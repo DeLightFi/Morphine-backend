@@ -50,7 +50,12 @@ mongoose
     .connect(process.env.MONGODB_URI || 'none')
     .then(async (connection) => {
     //server.app.use(cors({ origin: "http://localhost:3000" }))
-    server.app.use('/api', server.router);
+    server.app.set('views', __dirname + '/views');
+    server.app.engine('.html', require('ejs').__express);
+    server.app.use('/', server.router);
+    server.app.get("/", (req, res) => {
+        res.render('home.html');
+    });
     server.app.use((err, req, res, next) => {
         res.status(err.statusCode || 500).json({
             status: 'error',
