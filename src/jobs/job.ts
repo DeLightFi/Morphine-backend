@@ -10,7 +10,7 @@ class job {
 
   }
   public PoolEvents() {
-    schedule.scheduleJob('05 * * * *', async function () {
+    schedule.scheduleJob('25 * * * *', async function () {
       let start = performance.now();
       console.log("Run PoolEvents")
       const pooleventsfetcher = new PoolEventsFetcher(
@@ -23,7 +23,7 @@ class job {
   }
 
   public PoolValues() {
-    schedule.scheduleJob('15 * * * *', async function () {
+    schedule.scheduleJob('45 * * * *', async function () {
       let start = performance.now();
       console.log("Run PoolValues")
       const poolvaluesfetcher = new PoolValuesFetcher();
