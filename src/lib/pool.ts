@@ -6,12 +6,12 @@ import {
   bufferToHex,
 } from "@apibara/protocol";
 import { Block, TransactionReceipt } from "@apibara/starknet";
-import * as fs from "fs";
 import BN from "bn.js";
 import PoolEvent from "../schema/poolevent.model";
 import PoolValue from "../schema/poolvalue.model";
 import { hash, Provider, Contract, json } from "starknet";
 import { PoolMapping } from "./mapping";
+import pool_abi from "./abi/pool.json"
 
 
 function uint256FromBytes(low: Buffer, high: Buffer): BN {
@@ -169,10 +169,9 @@ export class PoolEventsFetcher {
 export class PoolValuesFetcher {
   // init
   private provider = new Provider({ sequencer: { network: 'goerli-alpha-2' } });
-  private compiledABI = json.parse(fs.readFileSync(require.resolve("./abi/pool.json")).toString("ascii"));
 
   async CallContract(pooladdress: string) {
-    const poolContract = new Contract(this.compiledABI.abi, pooladdress, this.provider);
+    const poolContract = new Contract(pool_abi.abi, pooladdress, this.provider);
 
     const borrowrate = await poolContract.call("borrowRate");
     const totalsupply = await poolContract.call("totalSupply");
