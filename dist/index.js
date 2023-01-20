@@ -29,6 +29,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
 const express_1 = __importDefault(require("express"));
 const mongoose = __importStar(require("mongoose"));
+const path_1 = __importDefault(require("path"));
 const job_1 = __importDefault(require("./jobs/job"));
 const MasterRouter_1 = __importDefault(require("./routers/MasterRouter"));
 // load the environment variables from the .env file
@@ -50,7 +51,7 @@ mongoose
     .connect(process.env.MONGODB_URI || 'none')
     .then(async (connection) => {
     //server.app.use(cors({ origin: "http://localhost:3000" }))
-    server.app.set('views', __dirname + '/views');
+    server.app.set('views', path_1.default.join(__dirname, 'views'));
     server.app.engine('.html', require('ejs').__express);
     server.app.use('/', server.router);
     server.app.get("/", (req, res) => {

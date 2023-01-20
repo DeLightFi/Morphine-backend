@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import express, { Request, Response, NextFunction } from 'express';
 import * as mongoose from 'mongoose';
+import path from 'path';
 import cors from 'cors';
 
 import job from './jobs/job';
@@ -26,7 +27,7 @@ mongoose
   .connect(process.env.MONGODB_URI || 'none')
   .then(async connection => {
     //server.app.use(cors({ origin: "http://localhost:3000" }))
-    server.app.set('views', __dirname + '/views');
+    server.app.set('views', path.join(__dirname, 'views'));
     server.app.engine('.html', require('ejs').__express);
     server.app.use('/', server.router);
 
