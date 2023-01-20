@@ -42,7 +42,7 @@ mongoose
       });
     });
 
-    ((port = process.env.APP_PORT || 5000) => {
+    ((port = process.env.PORT || 5000) => {
       server.app.listen(port, () => {
         console.log(("App is running at http://localhost:%d in %s mode"), port, process.env.NODE_ENV);
         console.log("Press CTRL-C to stop\n");
