@@ -11,3 +11,15 @@ export const PoolMapping = {
         "repayDripDebt"
     ]
 };
+
+export const DripMapping = {
+    key: [
+        "MultiCallStarted",
+        "MultiCallFinished",
+        "AddCollateral",
+        "IncreaseBorrowedAmount",
+        "DecreaseBorrowedAmount",
+        "Approval",
+        "Transfer"
+    ]
+};

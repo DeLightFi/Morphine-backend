@@ -136,7 +136,7 @@ class PoolValuesFetcher {
         this.provider = new starknet_2.Provider({ sequencer: { network: 'goerli-alpha-2' } });
     }
     async CallContract(pooladdress) {
-        const poolContract = new starknet_2.Contract(pool_json_1.default.abi, pooladdress, this.provider);
+        const poolContract = new starknet_2.Contract(pool_json_1.default, pooladdress, this.provider);
         const borrowrate = await poolContract.call("borrowRate");
         const totalsupply = await poolContract.call("totalSupply");
         const totalassets = await poolContract.call("totalAssets");

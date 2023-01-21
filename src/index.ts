@@ -62,6 +62,7 @@ mongoose
         console.log("Press CTRL-C to stop\n");
         job.PoolEvents();
         job.PoolValues();
+        job.MulticallEvents();
       });
 
       server.app.on('close', () => {

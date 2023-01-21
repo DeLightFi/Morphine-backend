@@ -171,7 +171,7 @@ export class PoolValuesFetcher {
   private provider = new Provider({ sequencer: { network: 'goerli-alpha-2' } });
 
   async CallContract(pooladdress: string) {
-    const poolContract = new Contract(pool_abi.abi, pooladdress, this.provider);
+    const poolContract = new Contract(pool_abi, pooladdress, this.provider);
 
     const borrowrate = await poolContract.call("borrowRate");
     const totalsupply = await poolContract.call("totalSupply");

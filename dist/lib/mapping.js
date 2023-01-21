@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PoolMapping = void 0;
+exports.DripMapping = exports.PoolMapping = void 0;
 exports.PoolMapping = {
     address: [
         "0x7e758f80c7f650d595e1e0920b4455cb241737afc86982fa81776439dfdd0af",
@@ -12,6 +12,17 @@ exports.PoolMapping = {
         "Deposit",
         "Borrow",
         "repayDripDebt"
+    ]
+};
+exports.DripMapping = {
+    key: [
+        "MultiCallStarted",
+        "MultiCallFinished",
+        "AddCollateral",
+        "IncreaseBorrowedAmount",
+        "DecreaseBorrowedAmount",
+        "Approval",
+        "Transfer"
     ]
 };
 //# sourceMappingURL=mapping.js.map
