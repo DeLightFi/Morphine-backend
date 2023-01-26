@@ -11,7 +11,7 @@ exports.PoolMapping = {
         "Withdraw",
         "Deposit",
         "Borrow",
-        "repayDripDebt"
+        "RepayDebt"
     ]
 };
 exports.DripMapping = {

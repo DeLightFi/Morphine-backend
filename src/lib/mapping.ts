@@ -8,7 +8,7 @@ export const PoolMapping = {
         "Withdraw",
         "Deposit",
         "Borrow",
-        "repayDripDebt"
+        "RepayDebt"
     ]
 };
 
