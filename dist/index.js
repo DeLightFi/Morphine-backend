@@ -29,12 +29,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
 const express_1 = __importDefault(require("express"));
 const mongoose = __importStar(require("mongoose"));
+const cors_1 = __importDefault(require("cors"));
 const job_1 = __importDefault(require("./jobs/job"));
 const MasterRouter_1 = __importDefault(require("./routers/MasterRouter"));
 // load the environment variables from the .env file
 dotenv_1.default.config({
     path: '.env'
 });
+var corsOptions = {
+    origin: '*',
+    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204 
+};
 /**
  * Express server application class.
  * @description Will later contain the routing system.
@@ -49,7 +54,7 @@ const server = new Server();
 mongoose
     .connect(process.env.MONGODB_URI || 'none')
     .then(async (connection) => {
-    //server.app.use(cors({ origin: "http://localhost:3000" }))
+    server.app.use((0, cors_1.default)(corsOptions));
     server.app.use('/', server.router);
     server.app.get("/", (req, res) => {
         res.send(`

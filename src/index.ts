@@ -12,6 +12,11 @@ dotenv.config({
   path: '.env'
 });
 
+var corsOptions = {
+  origin: '*',
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204 
+}
+
 /**
  * Express server application class.
  * @description Will later contain the routing system.
@@ -25,7 +30,7 @@ const server = new Server();
 mongoose
   .connect(process.env.MONGODB_URI || 'none')
   .then(async connection => {
-    //server.app.use(cors({ origin: "http://localhost:3000" }))
+    server.app.use(cors(corsOptions));
     server.app.use('/', server.router);
 
     server.app.get("/", (req: Request, res: Response) => {
