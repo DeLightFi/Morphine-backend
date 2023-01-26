@@ -104,7 +104,7 @@ class PoolEventsFetcher {
             else if ((0, protocol_1.hexToBuffer)(starknet_2.hash.getSelectorFromName("repayDripDebt"), 32).equals(event.keys[0])) {
                 from_ = "0x0";
                 to = "0x0"; // TODO: change it to pool address
-                amount = uint256FromBytes(Buffer.from(event.data[0]), Buffer.from(event.data[1]));
+                amount = uint256FromBytes(Buffer.from(event.data[2]), Buffer.from(event.data[3]));
             }
             else {
                 from_ = (0, protocol_1.bufferToHex)(Buffer.from(event.data[0]));

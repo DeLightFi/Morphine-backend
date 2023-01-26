@@ -128,8 +128,8 @@ export class PoolEventsFetcher {
         from_ = "0x0"
         to = "0x0" // TODO: change it to pool address
         amount = uint256FromBytes(
-          Buffer.from(event.data[0]),
-          Buffer.from(event.data[1])
+          Buffer.from(event.data[2]),
+          Buffer.from(event.data[3])
         );
       }
       else {

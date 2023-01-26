@@ -32,7 +32,7 @@ class job {
     constructor() {
     }
     PoolEvents() {
-        schedule.scheduleJob('50 * * * *', async function () {
+        schedule.scheduleJob('00 * * * *', async function () {
             let start = performance.now();
             console.log("Run PoolEvents");
             const pooleventsfetcher = new pool_1.PoolEventsFetcher("morphine-indexer-1", "goerli-2.starknet.stream.apibara.com:443");
