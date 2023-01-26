@@ -113,7 +113,7 @@ class DripEventsFetcher {
                         pool_address: drip_transit.pool,
                         drip: drip_transit.driptransit,
                         block: block.blockNumber,
-                        borrower: borrower,
+                        borrower: starknet_2.number.cleanHex(borrower),
                         payload: payload,
                         date: block.timestamp
                     }, { upsert: true, new: true, setDefaultsOnInsert: true });

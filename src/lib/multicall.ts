@@ -8,7 +8,7 @@ import {
 import { Block, TransactionReceipt } from "@apibara/starknet";
 import BN from "bn.js";
 import MulticallEvent from "../schema/multicallevent.model";
-import { hash, Provider, Contract, json, validateAndParseAddress } from "starknet";
+import { hash, Provider, Contract, number, validateAndParseAddress } from "starknet";
 import { PoolMapping, DripMapping } from "./mapping";
 import pool_abi from "./abi/pool.json"
 import dripmanager_abi from "./abi/dripmanager.json"
@@ -140,7 +140,7 @@ export class DripEventsFetcher {
               pool_address: drip_transit.pool,
               drip: drip_transit.driptransit,
               block: block.blockNumber,
-              borrower: borrower,
+              borrower: number.cleanHex(borrower),
               payload: payload,
               date: block.timestamp
             },

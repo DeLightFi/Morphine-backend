@@ -9,7 +9,7 @@ import { Block, TransactionReceipt } from "@apibara/starknet";
 import BN from "bn.js";
 import PoolEvent from "../schema/poolevent.model";
 import PoolValue from "../schema/poolvalue.model";
-import { hash, Provider, Contract, json } from "starknet";
+import { hash, Provider, Contract, number } from "starknet";
 import { PoolMapping } from "./mapping";
 import pool_abi from "./abi/pool.json"
 
@@ -151,8 +151,8 @@ export class PoolEventsFetcher {
           block: block.blockNumber,
           pool_address: t_address.toLowerCase(),
           event_name: t_key,
-          from: from_.toLowerCase(),
-          to: to.toLowerCase(),
+          from: number.cleanHex(from_.toLowerCase()),
+          to: number.cleanHex(to.toLowerCase()),
           amount: amount,
           date: block.timestamp
         },

@@ -119,8 +119,8 @@ class PoolEventsFetcher {
                 block: block.blockNumber,
                 pool_address: t_address.toLowerCase(),
                 event_name: t_key,
-                from: from_.toLowerCase(),
-                to: to.toLowerCase(),
+                from: starknet_2.number.cleanHex(from_.toLowerCase()),
+                to: starknet_2.number.cleanHex(to.toLowerCase()),
                 amount: amount,
                 date: block.timestamp
             }, { upsert: true, new: true, setDefaultsOnInsert: true });
