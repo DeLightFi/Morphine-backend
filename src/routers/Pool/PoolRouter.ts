@@ -22,6 +22,8 @@ class PoolRouter {
     this._router.get('/events/to/:walletaddress', this._controller.get_user_to_poolevents);
 
     this._router.get('/:pooladdress/values', this._controller.get_all_poolvalues);
+
+    this._router.get('/:pooladdress/interestratemodels', this._controller.get_all_poolinterestratemodels);
   }
 }
 

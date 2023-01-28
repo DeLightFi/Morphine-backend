@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 const ErrorHandler_1 = __importDefault(require("../models/ErrorHandler"));
 const poolevent_model_1 = __importDefault(require("../schema/poolevent.model"));
 const poolvalue_model_1 = __importDefault(require("../schema/poolvalue.model"));
+const poolinterestratemodel_model_1 = __importDefault(require("../schema/poolinterestratemodel.model"));
 class PoolController {
     defaultMethod() {
         throw new ErrorHandler_1.default(501, 'Not implemented method');
@@ -31,6 +32,12 @@ class PoolController {
         const { pooladdress } = req.params;
         //@ts-ignore
         const data = await poolvalue_model_1.default.find({ pool_address: pooladdress.toLowerCase() });
+        res.json({ data: data });
+    }
+    async get_all_poolinterestratemodels(req, res) {
+        const { pooladdress } = req.params;
+        //@ts-ignore
+        const data = await poolinterestratemodel_model_1.default.find({ pool_address: pooladdress.toLowerCase() });
         res.json({ data: data });
     }
 }

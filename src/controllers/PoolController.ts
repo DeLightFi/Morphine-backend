@@ -2,6 +2,7 @@ import * as Express from 'express';
 import ErrorHandler from "../models/ErrorHandler";
 import PoolEvent from "../schema/poolevent.model";
 import PoolValue from "../schema/poolvalue.model";
+import PoolInterestRateModel from '../schema/poolinterestratemodel.model';
 
 
 class PoolController {
@@ -34,6 +35,13 @@ class PoolController {
     const { pooladdress } = req.params;
     //@ts-ignore
     const data = await PoolValue.find({ pool_address: pooladdress.toLowerCase() })
+    res.json({ data: data })
+  }
+
+  public async get_all_poolinterestratemodels(req: Express.Request, res: Express.Response) {
+    const { pooladdress } = req.params;
+    //@ts-ignore
+    const data = await PoolInterestRateModel.find({ pool_address: pooladdress.toLowerCase() })
     res.json({ data: data })
   }
 }
