@@ -11,7 +11,7 @@ class job {
 
   }
   public PoolEvents() {
-    schedule.scheduleJob('40 * * * *', async function () {
+    schedule.scheduleJob('05 * * * *', async function () {
       let start = performance.now();
       console.log("Run PoolEvents")
       const pooleventsfetcher = new PoolEventsFetcher(
@@ -34,7 +34,7 @@ class job {
   }
 
   public PoolInterestRateModel() {
-    schedule.scheduleJob('57 * * * *', async function () {
+    schedule.scheduleJob('20 * * * *', async function () {
       let start = performance.now();
       console.log("Run PoolInterestRateModel")
       const poolinterestratemodelfetcher = new PoolInterestRateModelFetcher();
@@ -44,7 +44,7 @@ class job {
   }
 
   public MulticallEvents() {
-    schedule.scheduleJob('20 * * * *', async function () {
+    schedule.scheduleJob('30 * * * *', async function () {
       let start = performance.now();
       console.log("Run MulticallEvents")
       const multicalleventsfetcher = new DripEventsFetcher(
