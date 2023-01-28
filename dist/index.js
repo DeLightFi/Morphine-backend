@@ -86,6 +86,7 @@ mongoose
             console.log("Press CTRL-C to stop\n");
             job_1.default.PoolEvents();
             job_1.default.PoolValues();
+            job_1.default.PoolInterestRateModel();
             job_1.default.MulticallEvents();
         });
         server.app.on('close', () => {

@@ -3,15 +3,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PoolValuesFetcher = exports.PoolEventsFetcher = void 0;
+exports.PoolInterestRateModelFetcher = exports.PoolValuesFetcher = exports.PoolEventsFetcher = void 0;
 const protocol_1 = require("@apibara/protocol");
 const starknet_1 = require("@apibara/starknet");
 const bn_js_1 = __importDefault(require("bn.js"));
 const poolevent_model_1 = __importDefault(require("../schema/poolevent.model"));
 const poolvalue_model_1 = __importDefault(require("../schema/poolvalue.model"));
+const poolinterestratemodel_model_1 = __importDefault(require("../schema/poolinterestratemodel.model"));
 const starknet_2 = require("starknet");
 const mapping_1 = require("./mapping");
 const pool_json_1 = __importDefault(require("./abi/pool.json"));
+const interest_rate_model_abi_json_1 = __importDefault(require("./abi/interest_rate_model_abi.json"));
 function uint256FromBytes(low, high) {
     const lowB = new bn_js_1.default(low);
     const highB = new bn_js_1.default(high);
@@ -129,7 +131,6 @@ class PoolEventsFetcher {
     }
 }
 exports.PoolEventsFetcher = PoolEventsFetcher;
-// borrowrate / supplyrate / totalassets /  totalborrows --> hourly
 class PoolValuesFetcher {
     constructor() {
         // init
@@ -159,4 +160,36 @@ class PoolValuesFetcher {
     }
 }
 exports.PoolValuesFetcher = PoolValuesFetcher;
+class PoolInterestRateModelFetcher {
+    constructor() {
+        // init
+        this.provider = new starknet_2.Provider({ sequencer: { network: 'goerli-alpha-2' } });
+    }
+    async CallContract(pooladdress) {
+        const poolContract = new starknet_2.Contract(pool_json_1.default, pooladdress, this.provider);
+        const interestRateModelAddress = (0, protocol_1.bufferToHex)((await poolContract.call("interestRateModel")).interestRateModel);
+        console.log(interestRateModelAddress);
+        const interestRateModelContract = new starknet_2.Contract(interest_rate_model_abi_json_1.default, interestRateModelAddress, this.provider);
+        const modelParameters = await interestRateModelContract.call("modelParameters");
+        console.log(modelParameters);
+        //@ts-ignore
+        const newinterestratemodelvalue = new poolinterestratemodel_model_1.default({
+            pool_address: pooladdress.toLowerCase(),
+            interestratemodel_address: interestRateModelAddress,
+            optimal: uint256FromBytes(modelParameters.optimalLiquidityUtilization.low, modelParameters.optimalLiquidityUtilization.high).toString(),
+            baserate: uint256FromBytes(modelParameters.baseRate.low, modelParameters.baseRate.high).toString(),
+            slope1: uint256FromBytes(modelParameters.slope1.low, modelParameters.slope1.high).toString(),
+            slope2: uint256FromBytes(modelParameters.slope2.low, modelParameters.slope2.high).toString(),
+            date: Date.now()
+        });
+        console.log(newinterestratemodelvalue);
+        await newinterestratemodelvalue.save();
+    }
+    async PoolIterations() {
+        for (let pool_address of mapping_1.PoolMapping.address) {
+            await this.CallContract(pool_address.toLowerCase());
+        }
+    }
+}
+exports.PoolInterestRateModelFetcher = PoolInterestRateModelFetcher;
 //# sourceMappingURL=pool.js.map

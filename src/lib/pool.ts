@@ -9,9 +9,11 @@ import { Block, TransactionReceipt } from "@apibara/starknet";
 import BN from "bn.js";
 import PoolEvent from "../schema/poolevent.model";
 import PoolValue from "../schema/poolvalue.model";
+import PoolInterestRateModel from "../schema/poolinterestratemodel.model";
 import { hash, Provider, Contract, number } from "starknet";
 import { PoolMapping } from "./mapping";
 import pool_abi from "./abi/pool.json"
+import interest_rate_model_abi from "./abi/interest_rate_model_abi.json"
 
 
 function uint256FromBytes(low: Buffer, high: Buffer): BN {
@@ -165,7 +167,6 @@ export class PoolEventsFetcher {
 }
 
 
-// borrowrate / supplyrate / totalassets /  totalborrows --> hourly
 export class PoolValuesFetcher {
   // init
   private provider = new Provider({ sequencer: { network: 'goerli-alpha-2' } });
@@ -190,6 +191,44 @@ export class PoolValuesFetcher {
       }
     )
     await newpoolvalue.save()
+  }
+
+  async PoolIterations() {
+    for (let pool_address of PoolMapping.address) {
+      await this.CallContract(pool_address.toLowerCase());
+    }
+  }
+}
+
+
+export class PoolInterestRateModelFetcher {
+  // init
+  private provider = new Provider({ sequencer: { network: 'goerli-alpha-2' } });
+
+  async CallContract(pooladdress: string) {
+    const poolContract = new Contract(pool_abi, pooladdress, this.provider);
+
+    const interestRateModelAddress = bufferToHex((await poolContract.call("interestRateModel")).interestRateModel);
+    console.log(interestRateModelAddress);
+
+    const interestRateModelContract = new Contract(interest_rate_model_abi, interestRateModelAddress, this.provider);
+    const modelParameters = await interestRateModelContract.call("modelParameters");
+    console.log(modelParameters);
+
+    //@ts-ignore
+    const newinterestratemodelvalue = new PoolInterestRateModel(
+      {
+        pool_address: pooladdress.toLowerCase(),
+        interestratemodel_address: interestRateModelAddress,
+        optimal: uint256FromBytes(modelParameters.optimalLiquidityUtilization.low, modelParameters.optimalLiquidityUtilization.high).toString(),
+        baserate: uint256FromBytes(modelParameters.baseRate.low, modelParameters.baseRate.high).toString(),
+        slope1: uint256FromBytes(modelParameters.slope1.low, modelParameters.slope1.high).toString(),
+        slope2: uint256FromBytes(modelParameters.slope2.low, modelParameters.slope2.high).toString(),
+        date: Date.now()
+      }
+    )
+    console.log(newinterestratemodelvalue);
+    await newinterestratemodelvalue.save()
   }
 
   async PoolIterations() {

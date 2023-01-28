@@ -1,5 +1,5 @@
 import * as schedule from "node-schedule";
-import { PoolEventsFetcher, PoolValuesFetcher } from "../lib/pool";
+import { PoolEventsFetcher, PoolValuesFetcher, PoolInterestRateModelFetcher } from "../lib/pool";
 import { DripEventsFetcher } from "../lib/multicall";
 
 let padZero = (v: number, n = 2) => `${v}`.padStart(n, "0");
@@ -11,7 +11,7 @@ class job {
 
   }
   public PoolEvents() {
-    schedule.scheduleJob('30 * * * *', async function () {
+    schedule.scheduleJob('40 * * * *', async function () {
       let start = performance.now();
       console.log("Run PoolEvents")
       const pooleventsfetcher = new PoolEventsFetcher(
@@ -29,6 +29,16 @@ class job {
       console.log("Run PoolValues")
       const poolvaluesfetcher = new PoolValuesFetcher();
       await poolvaluesfetcher.PoolIterations();
+      console.log(`--- end | ${toTime(performance.now() - start)}`)
+    });
+  }
+
+  public PoolInterestRateModel() {
+    schedule.scheduleJob('57 * * * *', async function () {
+      let start = performance.now();
+      console.log("Run PoolInterestRateModel")
+      const poolinterestratemodelfetcher = new PoolInterestRateModelFetcher();
+      await poolinterestratemodelfetcher.PoolIterations();
       console.log(`--- end | ${toTime(performance.now() - start)}`)
     });
   }
