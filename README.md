@@ -11,7 +11,7 @@ To get the Node server running locally:
 - Configure the `.env` file using `.env.example` template
 - `npm run dev` to start the local server
 
-# Code Overview
+# 🧱 Code Overview
 
 ## Dependencies
 
@@ -29,15 +29,19 @@ To get the Node server running locally:
 - `routers/` - This folder contains the route definitions for our API.
 - `schema/` - This folder contains the schema definitions for our Mongoose models.
 
-# Jobs
+# 🐉 Jobs
 
-## Pool
+Fetch blockchain events using apibara and starknet.js according to a cron defined in job.ts file.
 
-- **PoolEvents** : fetch blockchain events using apibara
+- **PoolEvents** : HOURLY
 
-- **PoolValues** : fetch blockchain values using starknetjs
+- **PoolValues** : HOURLY
 
-# Routes
+- **PoolInterestRateModel** : HOURLY
+
+- **MulticallEvents** : HOURLY
+
+# 🔥 Routes
 
 ## Pool
 
@@ -49,14 +53,40 @@ Fetch all
 /pool/:pooladdress/events
 ```
 
-Fetch receiver events
+Fetch from events
 
 ```
-/pool/events/to/:receiveraddress
+/pool/events/from/:walletaddress
 ```
 
-Fetch sender events
+Fetch to events
 
 ```
-/pool/events/from/:senderaddress
+/pool/events/to/:walletaddress
+```
+
+- PoolValues
+
+Fetch all
+
+```
+/pool/:pooladdress/values
+```
+
+- PoolInterestRateModels
+
+Fetch all
+
+```
+/pool/:pooladdress/interestratemodels
+```
+
+## Muticall
+
+- MulticallEvents
+
+Fetch all
+
+```
+/multicall/:pooladdress/events
 ```
