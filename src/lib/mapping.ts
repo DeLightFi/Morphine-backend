@@ -20,6 +20,9 @@ export const DripMapping = {
         "IncreaseBorrowedAmount",
         "DecreaseBorrowedAmount",
         "Approval",
-        "Transfer"
+        "Transfer",
+        "Reedem",
+        "TokenEnable",
+        "TokenDisable"
     ]
 };

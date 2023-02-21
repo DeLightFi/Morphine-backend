@@ -22,7 +22,10 @@ exports.DripMapping = {
         "IncreaseBorrowedAmount",
         "DecreaseBorrowedAmount",
         "Approval",
-        "Transfer"
+        "Transfer",
+        "Reedem",
+        "TokenEnable",
+        "TokenDisable"
     ]
 };
 //# sourceMappingURL=mapping.js.map
