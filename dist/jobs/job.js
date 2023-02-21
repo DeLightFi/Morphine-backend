@@ -26,6 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const schedule = __importStar(require("node-schedule"));
 const pool_1 = require("../lib/pool");
 const multicall_1 = require("../lib/multicall");
+const drip_1 = require("../lib/drip");
 let padZero = (v, n = 2) => `${v}`.padStart(n, "0");
 let toTime = (v) => `elapsed (hh:mm:ss:ms) ${padZero(Math.floor(v / (60 * 60000)))}:${padZero(Math.floor(v / 60000))}:${padZero(Math.floor(v / 1000))}:${padZero(Math.floor(v % 1000), 3)}`;
 class job {
@@ -63,10 +64,23 @@ class job {
             let start = performance.now();
             console.log("Run MulticallEvents");
             const multicalleventsfetcher = new multicall_1.DripEventsFetcher("morphine-indexer-1", "goerli-2.starknet.stream.apibara.com:443");
-            const current_drips = await multicalleventsfetcher.getCurrentDrips();
-            for (let current_drip of current_drips) {
-                console.log(`-- fetching for drip ${current_drip.driptransit}`);
-                await multicalleventsfetcher.run(current_drip);
+            const current_driptransits = await multicalleventsfetcher.getCurrentDripTransits();
+            for (let current_driptransit of current_driptransits) {
+                console.log(`-- fetching for drip ${current_driptransit.dtaddress}`);
+                await multicalleventsfetcher.run(current_driptransit);
+            }
+            console.log(`--- end | ${toTime(performance.now() - start)}`);
+        });
+    }
+    ActiveDrips() {
+        schedule.scheduleJob('18 * * * *', async function () {
+            let start = performance.now();
+            console.log("Run ActiveDripFetcher");
+            const activedripsfetcher = new drip_1.ActiveDripsFetcher("morphine-indexer-1", "goerli-2.starknet.stream.apibara.com:443");
+            const active_drips = await activedripsfetcher.getActiveDripTransits();
+            for (let active_drip of active_drips) {
+                console.log(`-- fetching for drip ${active_drip.dtaddress}`);
+                await activedripsfetcher.run(active_drip);
             }
             console.log(`--- end | ${toTime(performance.now() - start)}`);
         });

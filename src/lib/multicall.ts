@@ -36,7 +36,7 @@ export class DripEventsFetcher {
     this.client = new NodeClient(url, credentials.createSsl());
   }
 
-  async getCurrentDrips() {
+  async getCurrentDripTransits() {
 
     let drip_managers = []
     for (let mapping_address of PoolMapping.address) {
@@ -52,13 +52,13 @@ export class DripEventsFetcher {
     for (let drip_manager_address of drip_managers) {
       const dripManagerContract = new Contract(dripmanager_abi, drip_manager_address.dripmanager, this.provider);
       const dripAddress = validateAndParseAddress(await (await dripManagerContract.call("dripTransit")).dripTransit.toString());
-      drip_transits.push({ pool: drip_manager_address.pool, driptransit: dripAddress })
+      drip_transits.push({ pool: drip_manager_address.pool, dtaddress: dripAddress })
     }
 
     return drip_transits;
   }
 
-  async run(drip_transit: { pool: string, driptransit: string }) {
+  async run(drip_transit: { pool: string, dtaddress: string }) {
     //@ts-ignore
     const last_multicallevent = await MulticallEvent.findOne({}, {}, { sort: { 'date': -1 } });
     var start_block = this.defaultblock;
@@ -84,7 +84,7 @@ export class DripEventsFetcher {
     })
   }
 
-  async handleData(message: proto.StreamMessagesResponse__Output, drip_transit: { pool: string, driptransit: string }) {
+  async handleData(message: proto.StreamMessagesResponse__Output, drip_transit: { pool: string, dtaddress: string }) {
     if (message.data) {
       if (!message.data.data.value) {
         throw new Error("received invalid data");
@@ -96,7 +96,7 @@ export class DripEventsFetcher {
     }
   }
 
-  async handleBlock(block: Block, drip_transit: { pool: string, driptransit: string }) {
+  async handleBlock(block: Block, drip_transit: { pool: string, dtaddress: string }) {
     for (let receipt of block.transactionReceipts) {
       if ((Date.now() - block.timestamp.getTime()) / 1000 <= 150) {
         this.shouldStop = true;
@@ -109,7 +109,7 @@ export class DripEventsFetcher {
   async handleTransaction(
     block: Block,
     receipt: TransactionReceipt,
-    drip_transit: { pool: string, driptransit: string }
+    drip_transit: { pool: string, dtaddress: string }
   ) {
     let i: number = 0;
     let borrower: string;
@@ -117,9 +117,9 @@ export class DripEventsFetcher {
     for (let event of receipt.events) {
       let t_address: string;
       let t_key: string;
-      let drip_adr = drip_transit.driptransit;
+      let drip_adr = drip_transit.dtaddress;
       if (hexToBuffer(drip_adr, 32).equals(event.fromAddress)) {
-        t_address = drip_transit.driptransit;
+        t_address = drip_transit.dtaddress;
         if (hexToBuffer(hash.getSelectorFromName("MultiCallStarted"), 32).equals(event.keys[0])) {
           this.isinmulticall = true;
           borrower = bufferToHex(Buffer.from(event.data[0])).toLowerCase();
@@ -138,7 +138,7 @@ export class DripEventsFetcher {
             {
               tx: bufferToHex(Buffer.from(receipt.transactionHash)),
               pool_address: drip_transit.pool,
-              drip: drip_transit.driptransit,
+              drip: drip_transit.dtaddress,
               block: block.blockNumber,
               borrower: number.cleanHex(borrower),
               payload: payload,
