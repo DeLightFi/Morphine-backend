@@ -14,7 +14,18 @@ const ActiveDripSchema = new mongoose_1.default.Schema({
     drip_address: {
         type: String,
     },
+    driptransit_address: {
+        type: String,
+    },
+    active: {
+        type: Boolean,
+        default: true,
+    },
     date: {
+        type: Date,
+        default: Date.now,
+    },
+    updated: {
         type: Date,
         default: Date.now,
     }

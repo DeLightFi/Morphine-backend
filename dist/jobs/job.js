@@ -73,9 +73,9 @@ class job {
         });
     }
     ActiveDrips() {
-        schedule.scheduleJob('18 * * * *', async function () {
+        schedule.scheduleJob('40 * * * *', async function () {
             let start = performance.now();
-            console.log("Run ActiveDripFetcher");
+            console.log("Run ActiveDripsFetcher");
             const activedripsfetcher = new drip_1.ActiveDripsFetcher("morphine-indexer-1", "goerli-2.starknet.stream.apibara.com:443");
             const active_drips = await activedripsfetcher.getActiveDripTransits();
             for (let active_drip of active_drips) {
