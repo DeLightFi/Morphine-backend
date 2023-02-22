@@ -67,7 +67,7 @@ class job {
   }
 
   public ActiveDrips() {
-    schedule.scheduleJob('26 * * * *', async function () {
+    schedule.scheduleJob('30 * * * *', async function () {
       let start = performance.now();
       console.log("Run ActiveDripsFetcher")
       const driptransitsfetcher = new DripTransitsFetcher(
@@ -88,7 +88,7 @@ class job {
   }
 
   public DripsValues() {
-    schedule.scheduleJob('55 * * * *', async function () {
+    schedule.scheduleJob('40 * * * *', async function () {
       let start = performance.now();
       console.log("Run DripsValues")
       const dripsvaluesfetcher = new DripValuesFetcher();

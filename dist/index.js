@@ -84,11 +84,11 @@ mongoose
         server.app.listen(port, () => {
             console.log(("App is running at http://localhost:%d in %s mode"), port, process.env.NODE_ENV);
             console.log("Press CTRL-C to stop\n");
-            /* job.PoolEvents();
-            job.PoolValues();
-            job.PoolInterestRateModel();
-            job.MulticallEvents();
-            job.ActiveDrips(); */
+            job_1.default.PoolEvents();
+            job_1.default.PoolValues();
+            job_1.default.PoolInterestRateModel();
+            job_1.default.MulticallEvents();
+            job_1.default.ActiveDrips();
             job_1.default.DripsValues();
         });
         server.app.on('close', () => {
