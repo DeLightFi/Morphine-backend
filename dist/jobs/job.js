@@ -27,6 +27,7 @@ const schedule = __importStar(require("node-schedule"));
 const pool_1 = require("../lib/pool");
 const multicall_1 = require("../lib/multicall");
 const drip_1 = require("../lib/drip");
+const driptransit_1 = require("../lib/driptransit");
 let padZero = (v, n = 2) => `${v}`.padStart(n, "0");
 let toTime = (v) => `elapsed (hh:mm:ss:ms) ${padZero(Math.floor(v / (60 * 60000)))}:${padZero(Math.floor(v / 60000))}:${padZero(Math.floor(v / 1000))}:${padZero(Math.floor(v % 1000), 3)}`;
 class job {
@@ -42,7 +43,7 @@ class job {
         });
     }
     PoolValues() {
-        schedule.scheduleJob('15 * * * *', async function () {
+        schedule.scheduleJob('23 * * * *', async function () {
             let start = performance.now();
             console.log("Run PoolValues");
             const poolvaluesfetcher = new pool_1.PoolValuesFetcher();
@@ -63,25 +64,36 @@ class job {
         schedule.scheduleJob('30 * * * *', async function () {
             let start = performance.now();
             console.log("Run MulticallEvents");
-            const multicalleventsfetcher = new multicall_1.DripEventsFetcher("morphine-indexer-1", "goerli-2.starknet.stream.apibara.com:443");
-            const current_driptransits = await multicalleventsfetcher.getCurrentDripTransits();
-            for (let current_driptransit of current_driptransits) {
-                console.log(`-- fetching for drip ${current_driptransit.dtaddress}`);
-                await multicalleventsfetcher.run(current_driptransit);
+            const driptransitsfetcher = new driptransit_1.DripTransitsFetcher("morphine-indexer-1", "goerli-2.starknet.stream.apibara.com:443");
+            const driptransits = await driptransitsfetcher.get();
+            for (let driptransit of driptransits) {
+                const multicalleventsfetcher = new multicall_1.DripEventsFetcher("morphine-indexer-1", "goerli-2.starknet.stream.apibara.com:443");
+                console.log(`-- fetching for drip ${driptransit.dtaddress}`);
+                await multicalleventsfetcher.run(driptransit);
             }
             console.log(`--- end | ${toTime(performance.now() - start)}`);
         });
     }
     ActiveDrips() {
-        schedule.scheduleJob('40 * * * *', async function () {
+        schedule.scheduleJob('30 * * * *', async function () {
             let start = performance.now();
             console.log("Run ActiveDripsFetcher");
-            const activedripsfetcher = new drip_1.ActiveDripsFetcher("morphine-indexer-1", "goerli-2.starknet.stream.apibara.com:443");
-            const active_drips = await activedripsfetcher.getActiveDripTransits();
-            for (let active_drip of active_drips) {
-                console.log(`-- fetching for drip ${active_drip.dtaddress}`);
-                await activedripsfetcher.run(active_drip);
+            const driptransitsfetcher = new driptransit_1.DripTransitsFetcher("morphine-indexer-1", "goerli-2.starknet.stream.apibara.com:443");
+            const driptransits = await driptransitsfetcher.get();
+            for (let driptransit of driptransits) {
+                console.log(`-- fetching for pool: ${driptransit.pool}`);
+                const activedripsfetcher = new drip_1.ActiveDripsFetcher("morphine-indexer-1", "goerli-2.starknet.stream.apibara.com:443");
+                await activedripsfetcher.run(driptransit);
             }
+            console.log(`--- end | ${toTime(performance.now() - start)}`);
+        });
+    }
+    DripsValues() {
+        schedule.scheduleJob('40 * * * *', async function () {
+            let start = performance.now();
+            console.log("Run DripsValues");
+            const dripsvaluesfetcher = new drip_1.DripValuesFetcher();
+            await dripsvaluesfetcher.DripIterations();
             console.log(`--- end | ${toTime(performance.now() - start)}`);
         });
     }

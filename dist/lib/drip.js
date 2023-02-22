@@ -3,15 +3,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ActiveDripsFetcher = void 0;
+exports.DripValuesFetcher = exports.ActiveDripsFetcher = void 0;
 const protocol_1 = require("@apibara/protocol");
 const starknet_1 = require("@apibara/starknet");
 const bn_js_1 = __importDefault(require("bn.js"));
 const activedrip_model_1 = __importDefault(require("../schema/activedrip.model"));
+const dripvalue_model_1 = __importDefault(require("../schema/dripvalue.model"));
 const starknet_2 = require("starknet");
+const dataprovider_json_1 = __importDefault(require("./abi/dataprovider.json"));
 const mapping_1 = require("./mapping");
-const pool_json_1 = __importDefault(require("./abi/pool.json"));
-const dripmanager_json_1 = __importDefault(require("./abi/dripmanager.json"));
 function uint256FromBytes(low, high) {
     const lowB = new bn_js_1.default(low);
     const highB = new bn_js_1.default(high);
@@ -23,31 +23,12 @@ class ActiveDripsFetcher {
     constructor(indexerId, url) {
         this.defaultblock = 60000;
         this.shouldStop = false;
-        this.provider = new starknet_2.Provider({ sequencer: { network: 'goerli-alpha-2' } });
         this.indexerId = indexerId;
         this.client = new protocol_1.NodeClient(url, protocol_1.credentials.createSsl());
     }
-    async getActiveDripTransits() {
-        let drip_managers = [];
-        for (let mapping_address of mapping_1.PoolMapping.address) {
-            const poolContract = new starknet_2.Contract(pool_json_1.default, mapping_address, this.provider);
-            const connectedDripManager = (0, starknet_2.validateAndParseAddress)(await (await poolContract.call("connectedDripManager")).dripManager.toString());
-            if (connectedDripManager != '0x0000000000000000000000000000000000000000000000000000000000000000') {
-                drip_managers.push({ pool: mapping_address, dripmanager: connectedDripManager });
-            }
-        }
-        let drip_transits = [];
-        for (let drip_manager_address of drip_managers) {
-            const dripManagerContract = new starknet_2.Contract(dripmanager_json_1.default, drip_manager_address.dripmanager, this.provider);
-            const dripAddress = (0, starknet_2.validateAndParseAddress)(await (await dripManagerContract.call("dripTransit")).dripTransit.toString());
-            drip_transits.push({ pool: drip_manager_address.pool, dtaddress: dripAddress });
-        }
-        return drip_transits;
-    }
     async run(drip_transit) {
-        this.shouldStop = false;
         //@ts-ignore
-        const last_activedrip = await activedrip_model_1.default.findOne({ driptransit_address: drip_transit.dtaddress }, {}, { sort: { 'date': -1 } });
+        const last_activedrip = await activedrip_model_1.default.findOne({ pool_address: drip_transit.pool }, {}, { sort: { 'date': -1 } });
         var start_block = this.defaultblock;
         if (last_activedrip) {
             start_block = parseInt(last_activedrip.block);
@@ -83,12 +64,13 @@ class ActiveDripsFetcher {
         if ((Date.now() - block.timestamp.getTime()) / 1000 <= 500) {
             //@ts-ignore
             await activedrip_model_1.default.findOneAndUpdate({
-                drip_address: "last_block_index",
-                driptransit_address: drip_transit.dtaddress
+                owner_address: "last_block_index",
+                pool_address: drip_transit.pool
             }, {
-                drip_address: "last_block_index",
-                driptransit_address: drip_transit.dtaddress,
+                owner_address: "last_block_index",
+                pool_address: drip_transit.pool,
                 block: block.blockNumber,
+                active: false,
                 date: block.timestamp,
                 updated: block.timestamp,
             }, { upsert: true, new: true, setDefaultsOnInsert: true });
@@ -110,18 +92,14 @@ class ActiveDripsFetcher {
                 if ((0, protocol_1.hexToBuffer)(starknet_2.hash.getSelectorFromName("OpenDrip"), 32).equals(event.keys[0])) {
                     console.log("OpenDrip");
                     let owner = (0, protocol_1.bufferToHex)(Buffer.from(event.data[0])).toLowerCase();
-                    let drip_address = (0, protocol_1.bufferToHex)(Buffer.from(event.data[1])).toLowerCase();
-                    let borrowed_amount = uint256FromBytes(Buffer.from(event.data[2]), Buffer.from(event.data[3]));
-                    //console.log("owner", owner);
-                    console.log("drip_address", drip_address);
-                    //console.log("borrowed_amount", borrowed_amount);
+                    console.log("owner", owner);
                     //@ts-ignore
                     await activedrip_model_1.default.findOneAndUpdate({
-                        drip_address: drip_address,
-                        driptransit_address: drip_adr
+                        owner_address: owner,
+                        pool_address: drip_transit.pool
                     }, {
-                        drip_address: drip_address,
-                        driptransit_address: drip_adr,
+                        owner_address: owner,
+                        pool_address: drip_transit.pool,
                         block: block.blockNumber,
                         date: block.timestamp,
                         updated: block.timestamp,
@@ -129,17 +107,15 @@ class ActiveDripsFetcher {
                 }
                 else if ((0, protocol_1.hexToBuffer)(starknet_2.hash.getSelectorFromName("CloseDrip"), 32).equals(event.keys[0])) {
                     console.log("CloseDrip");
-                    let caller = (0, protocol_1.bufferToHex)(Buffer.from(event.data[0])).toLowerCase();
                     let to = (0, protocol_1.bufferToHex)(Buffer.from(event.data[1])).toLowerCase();
-                    console.log("caller", caller);
-                    //console.log("to", to);
+                    console.log("to", to);
                     //@ts-ignore
                     await activedrip_model_1.default.findOneAndUpdate({
-                        drip_address: caller,
-                        driptransit_address: drip_adr
+                        owner_address: to,
+                        pool_address: drip_transit.pool
                     }, {
-                        drip_address: caller,
-                        driptransit_address: drip_adr,
+                        drip_address: to,
+                        pool_address: drip_transit.pool,
                         block: block.blockNumber,
                         active: false,
                         updated: block.timestamp,
@@ -150,4 +126,34 @@ class ActiveDripsFetcher {
     }
 }
 exports.ActiveDripsFetcher = ActiveDripsFetcher;
+class DripValuesFetcher {
+    constructor() {
+        // init
+        this.provider = new starknet_2.Provider({ sequencer: { network: 'goerli-alpha-2' } });
+    }
+    async CallContract(activedrip) {
+        const poolContract = new starknet_2.Contract(dataprovider_json_1.default, mapping_1.DataProviderMapping.contract_address, this.provider);
+        const info = await poolContract.getUserDripInfoFromPool(mapping_1.RegistryMapping.contract_address, activedrip.owner, activedrip.pool);
+        //@ts-ignore
+        const newdripvalue = new dripvalue_model_1.default({
+            owner: activedrip.owner.toLowerCase(),
+            pool: activedrip.pool.toLowerCase(),
+            user_balance: uint256FromBytes(info.DripFullInfo.user_balance.low, info.DripFullInfo.user_balance.high).toString(),
+            total_balance: uint256FromBytes(info.DripFullInfo.total_balance.low, info.DripFullInfo.total_balance.high).toString(),
+            total_weighted_balance: uint256FromBytes(info.DripFullInfo.total_weighted_balance.low, info.DripFullInfo.total_weighted_balance.high).toString(),
+            debt: uint256FromBytes(info.DripFullInfo.debt.low, info.DripFullInfo.debt.high).toString(),
+            health_factor: uint256FromBytes(info.DripFullInfo.health_factor.low, info.DripFullInfo.health_factor.high).toString(),
+            date: Date.now()
+        });
+        await newdripvalue.save();
+    }
+    async DripIterations() {
+        //@ts-ignore
+        const activedrips = await activedrip_model_1.default.find({ owner_address: { "$ne": "last_block_index" }, active: true });
+        for (let activedrip of activedrips) {
+            await this.CallContract({ owner: activedrip.owner_address, pool: activedrip.pool_address });
+        }
+    }
+}
+exports.DripValuesFetcher = DripValuesFetcher;
 //# sourceMappingURL=drip.js.map

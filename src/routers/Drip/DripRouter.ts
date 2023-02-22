@@ -18,6 +18,7 @@ class DripRouter {
    */
   private _configure() {
     this._router.get('/active', this._controller.get_all_activedrip);
+    this._router.get('/:owner/:pool', this._controller.get_all_dripvalues);
   }
 }
 

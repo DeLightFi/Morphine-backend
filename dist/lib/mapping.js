@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DripMapping = exports.PoolMapping = void 0;
+exports.RegistryMapping = exports.DataProviderMapping = exports.DripMapping = exports.PoolMapping = void 0;
 exports.PoolMapping = {
     address: [
         "0x7e758f80c7f650d595e1e0920b4455cb241737afc86982fa81776439dfdd0af",
@@ -27,5 +27,11 @@ exports.DripMapping = {
         "TokenEnable",
         "TokenDisable"
     ]
+};
+exports.DataProviderMapping = {
+    contract_address: "0x045df424d84031f362cff94a67a348aff33de74870d694c6dc0e2a5b936e8058"
+};
+exports.RegistryMapping = {
+    contract_address: "0x125488ac8537e3b858e9c1023d17d83a72866e79c3b9c23409e3e7c0c0b989c"
 };
 //# sourceMappingURL=mapping.js.map

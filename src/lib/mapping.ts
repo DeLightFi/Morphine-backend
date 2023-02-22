@@ -26,3 +26,11 @@ export const DripMapping = {
         "TokenDisable"
     ]
 };
+
+export const DataProviderMapping = {
+    contract_address: "0x045df424d84031f362cff94a67a348aff33de74870d694c6dc0e2a5b936e8058"
+};
+
+export const RegistryMapping = {
+    contract_address: "0x125488ac8537e3b858e9c1023d17d83a72866e79c3b9c23409e3e7c0c0b989c"
+};

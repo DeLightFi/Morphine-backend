@@ -7,25 +7,29 @@ const mongoose_1 = __importDefault(require("mongoose"));
 /**
  * Provider Schema
  */
-const ActiveDripSchema = new mongoose_1.default.Schema({
-    block: {
+const DripValueSchema = new mongoose_1.default.Schema({
+    owner: {
         type: String,
     },
-    owner_address: {
+    pool: {
         type: String,
     },
-    pool_address: {
+    user_balance: {
         type: String,
     },
-    active: {
-        type: Boolean,
-        default: true,
+    total_balance: {
+        type: String,
+    },
+    total_weighted_balance: {
+        type: String,
+    },
+    debt: {
+        type: String,
+    },
+    health_factor: {
+        type: String,
     },
     date: {
-        type: Date,
-        default: Date.now,
-    },
-    updated: {
         type: Date,
         default: Date.now,
     }
@@ -39,10 +43,10 @@ const ActiveDripSchema = new mongoose_1.default.Schema({
 /**
  * Methods
  */
-ActiveDripSchema.method({});
+DripValueSchema.method({});
 /**
- * @typedef ActiveDrip
+ * @typedef DripValue
  */
-exports.default = mongoose_1.default.models.ActiveDrip ||
-    mongoose_1.default.model('ActiveDrip', ActiveDripSchema);
-//# sourceMappingURL=activedrip.model.js.map
+exports.default = mongoose_1.default.models.DripValue ||
+    mongoose_1.default.model('DripValue', DripValueSchema);
+//# sourceMappingURL=dripvalue.model.js.map

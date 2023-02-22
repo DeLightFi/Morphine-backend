@@ -7,10 +7,10 @@ const ActiveDripSchema = new mongoose.Schema({
     block: {
         type: String,
     },
-    drip_address: {
+    owner_address: {
         type: String,
     },
-    driptransit_address: {
+    pool_address: {
         type: String,
     },
     active: {

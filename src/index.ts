@@ -68,8 +68,9 @@ mongoose
         /* job.PoolEvents();
         job.PoolValues();
         job.PoolInterestRateModel();
-        job.MulticallEvents(); */
-        job.ActiveDrips();
+        job.MulticallEvents();
+        job.ActiveDrips(); */
+        job.DripsValues();
       });
 
       server.app.on('close', () => {

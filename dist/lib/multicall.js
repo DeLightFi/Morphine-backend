@@ -10,8 +10,6 @@ const bn_js_1 = __importDefault(require("bn.js"));
 const multicallevent_model_1 = __importDefault(require("../schema/multicallevent.model"));
 const starknet_2 = require("starknet");
 const mapping_1 = require("./mapping");
-const pool_json_1 = __importDefault(require("./abi/pool.json"));
-const dripmanager_json_1 = __importDefault(require("./abi/dripmanager.json"));
 function uint256FromBytes(low, high) {
     const lowB = new bn_js_1.default(low);
     const highB = new bn_js_1.default(high);
@@ -24,26 +22,8 @@ class DripEventsFetcher {
         this.defaultblock = 51707;
         this.shouldStop = false;
         this.isinmulticall = false;
-        this.provider = new starknet_2.Provider({ sequencer: { network: 'goerli-alpha-2' } });
         this.indexerId = indexerId;
         this.client = new protocol_1.NodeClient(url, protocol_1.credentials.createSsl());
-    }
-    async getCurrentDripTransits() {
-        let drip_managers = [];
-        for (let mapping_address of mapping_1.PoolMapping.address) {
-            const poolContract = new starknet_2.Contract(pool_json_1.default, mapping_address, this.provider);
-            const connectedDripManager = (0, starknet_2.validateAndParseAddress)(await (await poolContract.call("connectedDripManager")).dripManager.toString());
-            if (connectedDripManager != '0x0000000000000000000000000000000000000000000000000000000000000000') {
-                drip_managers.push({ pool: mapping_address, dripmanager: connectedDripManager });
-            }
-        }
-        let drip_transits = [];
-        for (let drip_manager_address of drip_managers) {
-            const dripManagerContract = new starknet_2.Contract(dripmanager_json_1.default, drip_manager_address.dripmanager, this.provider);
-            const dripAddress = (0, starknet_2.validateAndParseAddress)(await (await dripManagerContract.call("dripTransit")).dripTransit.toString());
-            drip_transits.push({ pool: drip_manager_address.pool, dtaddress: dripAddress });
-        }
-        return drip_transits;
     }
     async run(drip_transit) {
         //@ts-ignore
