@@ -150,6 +150,14 @@ export class ActiveDripsFetcher {
             },
             { upsert: true, setDefaultsOnInsert: true }
           )
+
+          //@ts-ignore
+          await DripValue.deleteMany(
+            {
+              owner: to,
+              pool: drip_transit.pool
+            },
+          )
         }
       }
     }

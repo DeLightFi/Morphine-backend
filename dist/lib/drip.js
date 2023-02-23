@@ -120,6 +120,11 @@ class ActiveDripsFetcher {
                         active: false,
                         updated: block.timestamp,
                     }, { upsert: true, setDefaultsOnInsert: true });
+                    //@ts-ignore
+                    await dripvalue_model_1.default.deleteMany({
+                        owner: to,
+                        pool: drip_transit.pool
+                    });
                 }
             }
         }
