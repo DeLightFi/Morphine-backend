@@ -59,7 +59,7 @@ mongoose
     server.app.get("/", (req, res) => {
         res.send(`
         <body style="width: 100%; height: 100%; overflow: hidden; background-color: #313131;">
-          <img style="display: block; margin: 0 auto;" src="https://morphine.store//assets/logo/logo.png" alt="Example Image">
+          <img style="display: block; margin: 0 auto;" src="https://app.morphine.store//assets/logo/logo.png" alt="Example Image">
           <h2 style="text-align: center; color: #FFA72E; font-family: 'Inter';">Welcome to Morphine API.</h2>
           <p style="text-align: center; color: #FFA72E; font-family: 'Inter';">Please read the documentation:</p>
           <a href="https://github.com/Morphine-protocol/backend">
