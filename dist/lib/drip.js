@@ -33,7 +33,6 @@ class ActiveDripsFetcher {
         if (last_activedrip) {
             start_block = parseInt(last_activedrip.block);
         }
-        console.log("test", start_block);
         const messages = this.client.streamMessages({
             startingSequence: start_block
         });
