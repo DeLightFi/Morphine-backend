@@ -47,5 +47,7 @@ PoolEventSchema.method({})
 /**
  * @typedef PoolEvent
  */
+
 export default mongoose.models.PoolEvent ||
     mongoose.model('PoolEvent', PoolEventSchema)
+
