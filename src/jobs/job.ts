@@ -29,6 +29,8 @@ class Job {
     schedule.scheduleJob(config.jobs.interval.activeDrips, this.runActiveDrips);
     schedule.scheduleJob(config.jobs.interval.dripsValues, this.runDripsValues);
 
+
+    // run all jobs on start
     this.runAllJobs()
 
   }

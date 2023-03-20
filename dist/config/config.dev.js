@@ -35,6 +35,9 @@ const config = {
     registry: {
         address: (0, starknet_1.addAddressPadding)("0x125488ac8537e3b858e9c1023d17d83a72866e79c3b9c23409e3e7c0c0b989c")
     },
+    multicall: {
+        address: (0, starknet_1.addAddressPadding)("0x05754af3760f3356da99aea5c3ec39ccac7783d925a19666ebbeca58ff0087f4")
+    },
     fetchers: {
         poolEvents: {
             eventNames: [

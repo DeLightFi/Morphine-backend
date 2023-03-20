@@ -93,6 +93,7 @@ class Job {
         schedule.scheduleJob(config_1.default.jobs.interval.multicallEvents, this.runMulticallEvents);
         schedule.scheduleJob(config_1.default.jobs.interval.activeDrips, this.runActiveDrips);
         schedule.scheduleJob(config_1.default.jobs.interval.dripsValues, this.runDripsValues);
+        // run all jobs on start
         this.runAllJobs();
     }
     async runAllJobs() {

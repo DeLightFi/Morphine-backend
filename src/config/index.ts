@@ -2,6 +2,8 @@ import fs from 'fs';
 import dotenv from 'dotenv';
 dotenv.config()
 
+import { MorphineConfig } from './config.d';
+
 import devConfig from "./config.dev"
 import prodConfig from "./config.prod"
 
@@ -17,18 +19,6 @@ const getEnvironnementConfig = () => {
     }
 }
 
-type MorphineConfig = {
-    server: any,
-    network: string,
-    apibaraUrl: string,
-    jobs: {
-        interval: { [key: string]: string }
-    },
-    pools: {name:string, address:string}[],
-    fetchers: { [key: string]: any }
-    dataProvider: any,
-    registry: any
-}
 
 //@ts-ignore
 const config: MorphineConfig = {
