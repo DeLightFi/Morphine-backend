@@ -6,16 +6,12 @@ import cors from 'cors';
 import job from './jobs/job';
 import MasterRouter from './routers/MasterRouter';
 import ErrorHandler from './models/ErrorHandler';
+import config from './config';
 
 // load the environment variables from the .env file
 dotenv.config({
   path: '.env'
 });
-
-var corsOptions = {
-  origin: '*',
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204 
-}
 
 /**
  * Express server application class.
@@ -30,7 +26,7 @@ const server = new Server();
 mongoose
   .connect(process.env.MONGODB_URI || 'none')
   .then(async connection => {
-    server.app.use(cors(corsOptions));
+    server.app.use(cors(config.server.corsOptions));
     server.app.use('/', server.router);
 
     server.app.get("/", (req: Request, res: Response) => {
@@ -65,12 +61,8 @@ mongoose
       server.app.listen(port, () => {
         console.log(("App is running at http://localhost:%d in %s mode"), port, process.env.NODE_ENV);
         console.log("Press CTRL-C to stop\n");
-        job.PoolEvents();
-        job.PoolValues();
-        job.PoolInterestRateModel();
-        job.MulticallEvents();
-        job.ActiveDrips();
-        job.DripsValues();
+
+        job.scheduleJobs();
       });
 
       server.app.on('close', () => {

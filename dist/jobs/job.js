@@ -22,81 +22,88 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const schedule = __importStar(require("node-schedule"));
-const pool_1 = require("../lib/pool");
-const multicall_1 = require("../lib/multicall");
-const drip_1 = require("../lib/drip");
-const driptransit_1 = require("../lib/driptransit");
-let padZero = (v, n = 2) => `${v}`.padStart(n, "0");
-let toTime = (v) => `elapsed (hh:mm:ss:ms) ${padZero(Math.floor(v / (60 * 60000)))}:${padZero(Math.floor(v / 60000))}:${padZero(Math.floor(v / 1000))}:${padZero(Math.floor(v % 1000), 3)}`;
-class job {
+const PoolEventsFetcher_1 = __importDefault(require("../fetchers/PoolEventsFetcher"));
+const PoolValuesFetcher_1 = __importDefault(require("../fetchers/PoolValuesFetcher"));
+const PoolInterestRateModelFetcher_1 = __importDefault(require("../fetchers/PoolInterestRateModelFetcher"));
+const DripTransitsFetcher_1 = __importDefault(require("../fetchers/DripTransitsFetcher"));
+const DripEventsFetcher_1 = __importDefault(require("../fetchers/DripEventsFetcher"));
+const DripValuesFetcher_1 = __importDefault(require("../fetchers/DripValuesFetcher"));
+const ActiveDripsFetcher_1 = __importDefault(require("../fetchers/ActiveDripsFetcher"));
+const config_1 = __importDefault(require("../config"));
+const padZero = (v, n = 2) => `${v}`.padStart(n, "0");
+const toTime = (v) => `elapsed (hh:mm:ss:ms) ${padZero(Math.floor(v / (60 * 60000)))}:${padZero(Math.floor(v / 60000))}:${padZero(Math.floor(v / 1000))}:${padZero(Math.floor(v % 1000), 3)}`;
+class Job {
     constructor() {
-    }
-    PoolEvents() {
-        schedule.scheduleJob('05 * * * *', async function () {
-            let start = performance.now();
-            console.log("Run PoolEvents");
-            const pooleventsfetcher = new pool_1.PoolEventsFetcher("morphine-indexer-1", "goerli-2.starknet.stream.apibara.com:443");
-            await pooleventsfetcher.run();
+        this.runPoolEvents = async () => {
+            const start = performance.now();
+            console.log("\nRun PoolEvents");
+            const poolEventsFetcher = new PoolEventsFetcher_1.default(config_1.default.apibaraUrl);
+            await poolEventsFetcher.run();
             console.log(`--- end | ${toTime(performance.now() - start)}`);
-        });
-    }
-    PoolValues() {
-        schedule.scheduleJob('23 * * * *', async function () {
-            let start = performance.now();
-            console.log("Run PoolValues");
-            const poolvaluesfetcher = new pool_1.PoolValuesFetcher();
+        };
+        this.runPoolValues = async () => {
+            const start = performance.now();
+            console.log("\nRun PoolValues");
+            const poolvaluesfetcher = new PoolValuesFetcher_1.default(config_1.default.network);
             await poolvaluesfetcher.PoolIterations();
             console.log(`--- end | ${toTime(performance.now() - start)}`);
-        });
-    }
-    PoolInterestRateModel() {
-        schedule.scheduleJob('20 * * * *', async function () {
-            let start = performance.now();
-            console.log("Run PoolInterestRateModel");
-            const poolinterestratemodelfetcher = new pool_1.PoolInterestRateModelFetcher();
+        };
+        this.runPoolInterestRateModel = async () => {
+            const start = performance.now();
+            console.log("\nRun PoolInterestRateModel");
+            const poolinterestratemodelfetcher = new PoolInterestRateModelFetcher_1.default(config_1.default.network);
             await poolinterestratemodelfetcher.PoolIterations();
             console.log(`--- end | ${toTime(performance.now() - start)}`);
-        });
-    }
-    MulticallEvents() {
-        schedule.scheduleJob('30 * * * *', async function () {
-            let start = performance.now();
-            console.log("Run MulticallEvents");
-            const driptransitsfetcher = new driptransit_1.DripTransitsFetcher("morphine-indexer-1", "goerli-2.starknet.stream.apibara.com:443");
-            const driptransits = await driptransitsfetcher.get();
-            for (let driptransit of driptransits) {
-                const multicalleventsfetcher = new multicall_1.DripEventsFetcher("morphine-indexer-1", "goerli-2.starknet.stream.apibara.com:443");
-                console.log(`-- fetching for drip ${driptransit.dtaddress}`);
-                await multicalleventsfetcher.run(driptransit);
-            }
+        };
+        this.runMulticallEvents = async () => {
+            const start = performance.now();
+            console.log("\nRun MulticallEvents");
+            const dripTransitsFetcher = new DripTransitsFetcher_1.default(config_1.default.network);
+            const dripTransits = await dripTransitsFetcher.get();
+            const dripEventsFetcher = new DripEventsFetcher_1.default(config_1.default.apibaraUrl, dripTransits);
+            await dripEventsFetcher.run();
             console.log(`--- end | ${toTime(performance.now() - start)}`);
-        });
-    }
-    ActiveDrips() {
-        schedule.scheduleJob('30 * * * *', async function () {
-            let start = performance.now();
-            console.log("Run ActiveDripsFetcher");
-            const driptransitsfetcher = new driptransit_1.DripTransitsFetcher("morphine-indexer-1", "goerli-2.starknet.stream.apibara.com:443");
-            const driptransits = await driptransitsfetcher.get();
-            for (let driptransit of driptransits) {
-                console.log(`-- fetching for pool: ${driptransit.pool}`);
-                const activedripsfetcher = new drip_1.ActiveDripsFetcher("morphine-indexer-1", "goerli-2.starknet.stream.apibara.com:443");
-                await activedripsfetcher.run(driptransit);
-            }
+        };
+        this.runActiveDrips = async () => {
+            const start = performance.now();
+            console.log("\nRun ActiveDripsFetcher");
+            const dripTransitsFetcher = new DripTransitsFetcher_1.default(config_1.default.network);
+            const dripTransits = await dripTransitsFetcher.get();
+            const activeDripsFetcher = new ActiveDripsFetcher_1.default(config_1.default.apibaraUrl, dripTransits);
+            await activeDripsFetcher.run();
             console.log(`--- end | ${toTime(performance.now() - start)}`);
-        });
-    }
-    DripsValues() {
-        schedule.scheduleJob('40 * * * *', async function () {
-            let start = performance.now();
-            console.log("Run DripsValues");
-            const dripsvaluesfetcher = new drip_1.DripValuesFetcher();
-            await dripsvaluesfetcher.DripIterations();
+        };
+        this.runDripsValues = async () => {
+            const start = performance.now();
+            console.log("\nRun DripsValues");
+            const dripsValuesFetcher = new DripValuesFetcher_1.default(config_1.default.network);
+            await dripsValuesFetcher.DripIterations();
             console.log(`--- end | ${toTime(performance.now() - start)}`);
-        });
+        };
+    }
+    async scheduleJobs() {
+        schedule.scheduleJob(config_1.default.jobs.interval.poolEvents, this.runPoolEvents);
+        schedule.scheduleJob(config_1.default.jobs.interval.poolValues, this.runPoolValues);
+        schedule.scheduleJob(config_1.default.jobs.interval.poolInterestRateModel, this.runPoolInterestRateModel);
+        schedule.scheduleJob(config_1.default.jobs.interval.multicallEvents, this.runMulticallEvents);
+        schedule.scheduleJob(config_1.default.jobs.interval.activeDrips, this.runActiveDrips);
+        schedule.scheduleJob(config_1.default.jobs.interval.dripsValues, this.runDripsValues);
+        // run all jobs on start
+        this.runAllJobs();
+    }
+    async runAllJobs() {
+        await this.runPoolEvents();
+        await this.runPoolValues();
+        await this.runPoolInterestRateModel();
+        await this.runMulticallEvents();
+        await this.runActiveDrips();
+        await this.runDripsValues();
     }
 }
-exports.default = new job();
+exports.default = new Job();
 //# sourceMappingURL=job.js.map
